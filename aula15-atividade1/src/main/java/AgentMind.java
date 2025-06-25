@@ -21,6 +21,7 @@ import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.Mind;
 import br.unicamp.cst.representation.idea.Idea;
+import codelets.behaviors.Delivery;
 import codelets.behaviors.EatClosestApple;
 import codelets.behaviors.Forage;
 import codelets.behaviors.GetClosestJewel;
@@ -218,6 +219,14 @@ public class AgentMind extends Mind {
                 insertCodelet(forage);
                 registerCodelet(forage,"Behavioral");
                 behavioralCodelets.add(forage);
+
+		Codelet delivery = new Delivery(creatureBasicSpeed,reachDistance);
+		delivery.addInput(leafletsStatusMO);
+		delivery.addInput(innerSenseMO);
+		delivery.addOutput(legsMO);
+                insertCodelet(delivery);
+                registerCodelet(delivery,"Behavioral");
+                behavioralCodelets.add(delivery);
                 
                 // sets a time step for running the codelets to avoid heating too much your machine
                 for (Codelet c : this.getCodeRack().getAllCodelets())

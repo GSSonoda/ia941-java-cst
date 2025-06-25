@@ -51,13 +51,11 @@ public class LeafletStatus extends Codelet{
 
 	@Override
 	public void accessMemoryObjects() {
-		System.out.println("DEBUG proc");
 		leafletsStatusMO=(MemoryObject)this.getOutput("LEAFLETS_STATUS");
 	}
 
 	@Override
 	public void proc() {
-				System.out.println("DEBUG proc");
              c.updateState();
              
              synchronized (leafletsStatusMO) {
@@ -66,7 +64,6 @@ public class LeafletStatus extends Codelet{
 				for (Leaflet l : leaflets){
 					leafletsStatus.add(l.isCompleted());
 				}
-				System.out.println("leafletsStatus: " + leafletsStatus);
                 leafletsStatusMO.setI(leafletsStatus);
                 
              }

@@ -66,7 +66,7 @@ public class ResourcesGenerator extends Thread {
                 }
 
                 System.out.println("..............ResourcesGenerator SLEEPING........");
-                Thread.sleep(timeInMinutes * 40000);
+                Thread.sleep(timeInMinutes * 5000);
 
             } catch (Exception ex) {
                 ex.printStackTrace();
