@@ -33,6 +33,7 @@ import codelets.perception.ClosestAppleDetector;
 import codelets.perception.ClosestJewelDetector;
 import codelets.perception.JewelDetector;
 import codelets.sensors.InnerSense;
+import codelets.sensors.LeafletStatus;
 import codelets.sensors.Vision;
 import java.awt.Polygon;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import ws3dproxy.model.Thing;
 public class AgentMind extends Mind {
     
     private static int creatureBasicSpeed=3;
-    private static int reachDistance=50;
+    private static int reachDistance=100;
     private static int minimumFuel=400;
     public ArrayList<Codelet> behavioralCodelets = new ArrayList<Codelet>();
     
@@ -71,6 +72,7 @@ public class AgentMind extends Mind {
                 Memory knownApplesMO;
                 Memory closestJewelMO;
                 Memory knownJewelsMO;
+                Memory leafletsStatusMO;
                 
                 //Initialize Memory Objects
                 legsMO=createMemoryContainer("LEGS");
@@ -100,6 +102,11 @@ public class AgentMind extends Mind {
                 cis.add(fov);
                 innerSenseMO=createMemoryObject("INNER", cis);
                 registerMemory(innerSenseMO,"Sensory");
+                // Sensory leafletsStatus
+                List<Boolean> leafletsStatus = Collections.synchronizedList(new ArrayList<Boolean>());
+                leafletsStatusMO=createMemoryObject("LEAFLETS_STATUS", leafletsStatus);
+                registerMemory(leafletsStatusMO,"Sensory");
+
                 Thing closestApple = null;
                 closestAppleMO=createMemoryObject("CLOSEST_APPLE", closestApple);
                 registerMemory(closestAppleMO,"Working");
@@ -124,6 +131,11 @@ public class AgentMind extends Mind {
 		innerSense.addOutput(innerSenseMO);
                 insertCodelet(innerSense); //A sensor for the inner state of the creature
                 registerCodelet(innerSense,"Sensory");
+
+                Codelet leafletStatus = new LeafletStatus(env.c);
+                leafletStatus.addOutput(leafletsStatusMO);
+                insertCodelet(leafletStatus);
+                registerCodelet(vision,"Sensory");
 		
 		// Create Actuator Codelets
 		Codelet legs=new LegsActionCodelet(env.c);
@@ -201,7 +213,8 @@ public class AgentMind extends Mind {
                 
                 Codelet forage=new Forage();
 		forage.addInput(knownApplesMO);
-                forage.addOutput(legsMO);
+                forage.addInput(knownJewelsMO);
+                forage.addOutput(legsMO);                
                 insertCodelet(forage);
                 registerCodelet(forage,"Behavioral");
                 behavioralCodelets.add(forage);
