@@ -25,10 +25,13 @@ import org.json.JSONObject;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryContainer;
+
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 import org.json.JSONException;
 import ws3dproxy.model.Creature;
+import ws3dproxy.model.Leaflet;
 
 /**
  *  Legs Action Codelet monitors working storage for instructions and acts on the World accordingly.
@@ -61,9 +64,9 @@ public class LegsActionCodelet extends Codelet{
 	@Override
 	public void proc() {
             
-                String comm = (String) legsActionMO.getI();
-                if (comm == null) comm = "";
-                Random r = new Random();
+            String comm = (String) legsActionMO.getI();
+            if (comm == null) comm = "";
+            Random r = new Random();
 		
 		if(!comm.equals("") ){
 			
@@ -98,6 +101,23 @@ public class LegsActionCodelet extends Codelet{
 					    previousTargetx=targetx;
 					    previousTargety=targety;
                                         }
+                                    else if(action.equals("DELIVERY")){
+                                        System.out.println("DELIVERY");
+                                        List<Leaflet> leaflets = c.getLeaflets();
+                                        for (Leaflet l : leaflets){
+                                            if (l.isCompleted()){
+                                                try{
+                                                    c.deliverLeaflet(l.getID().toString());
+                                                }
+                                                catch(Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                
+                                            }
+                                            
+                                        }
+                                        
+                                    }
                                         
 				    } else {
 					log.info("Sending stop command to agent");

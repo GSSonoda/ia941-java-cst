@@ -24,6 +24,8 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryContainer;
@@ -63,77 +65,85 @@ public class Delivery extends Codelet {
 		// Find distance between creature and closest apple
 		//If far, go towards it
 		//If close, stops
-
-		Thing closestApple = (Thing) leafletStatusMO.getI();
 		Idea cis = (Idea) selfInfoMO.getI();
+		List<Boolean> leafletStatus = (List<Boolean>) leafletStatusMO.getI();
+	
+		double selfX=(double)cis.get("position.x").getValue();
+		double selfY=(double)cis.get("position.y").getValue();
 
-		if(closestApple != null)
-		{
-			List<Boolean> leafletStatus = (List<Boolean>) leafletStatusMO.getI();
-     
-			double selfX=(double)cis.get("position.x").getValue();
-			double selfY=(double)cis.get("position.y").getValue();
+		Point2D pSpot = new Point();
+		pSpot.setLocation(xSpot, ySpot);
 
-			Point2D pSpot = new Point();
-			pSpot.setLocation(xSpot, ySpot);
+		Point2D pSelf = new Point();
+		pSelf.setLocation(selfX, selfY);
 
-			Point2D pSelf = new Point();
-			pSelf.setLocation(selfX, selfY);
-
-			double distance = pSelf.distance(pSpot);
-            Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
-			try {
-				if(distance>reachDistance && leafletStatus.contains(true)){ //Go to it
-					message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-					message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
-					message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
-					message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
-					activation=1.0;
-					legsMO.setI(toJson(message),activation,name);
-
-				}else
-				{//Stop
-                                        message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-                                        message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
-                                        message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
-                                        message.add(Idea.createIdea("SPEED",0, Idea.guessType("Property",null,1.0,0.5)));
-                                        activation=0.5;
-										legsMO.setI(toJson(message),activation,name);
+		double distance = pSelf.distance(pSpot);
+		// Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
+		try {
+			if(distance>reachDistance && leafletStatus.contains(true)){ //Go to it
+				// message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
+				JSONObject message=new JSONObject();
+				try {
+					message.put("ACTION", "DELIVERY");
+									activation=1.0;
+					legsMO.setI(message.toString(),activation,name);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}	
-		}
-                else {
-                    activation=0.0;
-                    legsMO.setI("",activation,name);
-                }
+
+			}else if (leafletStatus.contains(true))
+			{//Stop
+				// message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
+				// message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
+				JSONObject message=new JSONObject();
+				try {
+					message.put("ACTION", "DELIVERY");
+									activation=1.0;
+					legsMO.setI(message.toString(),activation,name);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+            else activation=0.0;
+            JSONObject message=new JSONObject();
+            message.put("ACTION", "DELIVERY");
+            legsMO.setI(message.toString(),activation,name);	
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}	
                 
 	}//end proc
         
-        @Override
-        public void calculateActivation() {
-        
-        }
-        
-        String toJson(Idea i) {
-            String q = "\"";
-            String out = "{";
-            String val;
-            int ii=0;
-            for (Idea il : i.getL()) {
-                if (il.getL().isEmpty()) {
-                    if (il.isNumber()) val = il.getValue().toString();
-                    else val = q+il.getValue()+q;
-                }
-                else val = toJson(il);
-                if (ii == 0) out += q+il.getName()+q+":"+val;
-                else out += ","+q+il.getName()+q+":"+val;
-                ii++;
-            }
-            out += "}";
-            return out;
-        }
+	@Override
+	public void calculateActivation() {
+	
+	}
+	
+	String toJson(Idea i) {
+		String q = "\"";
+		String out = "{";
+		String val;
+		int ii=0;
+		for (Idea il : i.getL()) {
+			if (il.getL().isEmpty()) {
+				if (il.isNumber()) val = il.getValue().toString();
+				else val = q+il.getValue()+q;
+			}
+			else val = toJson(il);
+			if (ii == 0) out += q+il.getName()+q+":"+val;
+			else out += ","+q+il.getName()+q+":"+val;
+			ii++;
+		}
+		out += "}";
+		return out;
+	}
 
 }
