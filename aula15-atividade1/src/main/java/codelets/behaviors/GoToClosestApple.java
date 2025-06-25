@@ -95,7 +95,8 @@ public class GoToClosestApple extends Codelet {
                                         message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
                                         activation=1.0;
 
-				}else{//Stop
+				}else if(fuel < this.minimumFuel)
+				{//Stop
                                         message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
                                         message.add(Idea.createIdea("X",(int)appleX, Idea.guessType("Property",null,1.0,0.5)));
                                         message.add(Idea.createIdea("Y",(int)appleY, Idea.guessType("Property",null,1.0,0.5)));
