@@ -43,6 +43,7 @@ public class AgentMind extends Mind {
     
     private static int creatureBasicSpeed=3;
     private static int reachDistance=50;
+    private static int minimumFuel=400;
     public ArrayList<Codelet> behavioralCodelets = new ArrayList<Codelet>();
     
     public AgentMind(Environment env) {
@@ -137,7 +138,7 @@ public class AgentMind extends Mind {
                 registerCodelet(closestAppleDetector,"Perception");
 		
 		// Create Behavior Codelets
-		Codelet goToClosestApple = new GoToClosestApple(creatureBasicSpeed,reachDistance);
+		Codelet goToClosestApple = new GoToClosestApple(creatureBasicSpeed,reachDistance, minimumFuel);
 		goToClosestApple.addInput(closestAppleMO);
 		goToClosestApple.addInput(innerSenseMO);
 		goToClosestApple.addOutput(legsMO);

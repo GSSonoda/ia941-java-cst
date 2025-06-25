@@ -83,3 +83,7 @@ hs_err_pid*
 #Exception
 !/lib/*.jar
 !/gradle/wrapper/*.jar
+
+aula15-atividade1/build/tmp/compileJava/compileTransaction/stash-dir/
+
+aula15-atividade1/build/tmp/compileJava/
