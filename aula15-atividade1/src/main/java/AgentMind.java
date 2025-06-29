@@ -146,6 +146,10 @@ public class AgentMind extends Mind {
 
 		Codelet hands=new HandsActionCodelet(env.c);
 		hands.addInput(handsMO);
+                hands.addOutput(knownJewelsMO);
+                hands.addOutput(knownApplesMO);
+                hands.addOutput(closestJewelMO);
+                hands.addOutput(closestAppleMO);
                 insertCodelet(hands);
                 registerCodelet(hands,"Motor");
 		

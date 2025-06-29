@@ -26,9 +26,13 @@ import org.json.JSONObject;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryObject;
+
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import ws3dproxy.model.Creature;
+import ws3dproxy.model.Thing;
 
 /**
  *  Hands Action Codelet monitors working storage for instructions and acts on the World accordingly.
@@ -41,25 +45,43 @@ import ws3dproxy.model.Creature;
 public class HandsActionCodelet extends Codelet{
 
 	private Memory handsMO;
+	private Memory knownJewelsMO;
+	private Memory knownApplesMO;
+	private Memory closestAppleMO;
+	private Memory closestJewelMO;
 	private String previousHandsAction="";
-        private Creature c;
-        private Random r = new Random();
-        static Logger log = Logger.getLogger(HandsActionCodelet.class.getCanonicalName());
+	private Creature c;
+	private Random r = new Random();
+	static Logger log = Logger.getLogger(HandsActionCodelet.class.getCanonicalName());
+	private List<Thing> knownJewels;
+	private List<Thing> knownApples;
+	private Thing closestApple;
+	private Thing closestJewel;
 
 	public HandsActionCodelet(Creature nc) {
                 c = nc;
                 this.name = "HandsActionCodelet";
 	}
 	
-        @Override
+    @Override
 	public void accessMemoryObjects() {
 		handsMO=(MemoryObject)this.getInput("HANDS");
+		knownJewelsMO=(MemoryObject)this.getOutput("KNOWN_JEWELS");
+		knownApplesMO=(MemoryObject)this.getOutput("KNOWN_APPLES");
+		closestJewelMO=(MemoryObject)this.getOutput("CLOSEST_JEWEL");
+		closestAppleMO=(MemoryObject)this.getOutput("CLOSEST_APPLE");
 	}
+
 	public void proc() {
             
-                String command = (String) handsMO.getI();
+        String command = (String) handsMO.getI();
+		knownJewels = (List<Thing>) knownJewelsMO.getI();
+		knownApples = (List<Thing>) knownApplesMO.getI();
+		closestJewel = (Thing) closestJewelMO.getI();
+		closestApple = (Thing) closestAppleMO.getI();
 
-		if(!command.equals("") && (!command.equals(previousHandsAction))){
+		// if(!command.equals("") && (!command.equals(previousHandsAction))){
+		if(!command.equals("")){
 			JSONObject jsonAction;
 			try {
 				jsonAction = new JSONObject(command);
@@ -67,54 +89,56 @@ public class HandsActionCodelet extends Codelet{
 					String action=jsonAction.getString("ACTION");
 					String objectName=jsonAction.getString("OBJECT");
 					if(action.equals("PICKUP")){
-                                                try {
-                                                 c.putInSack(objectName);
-                                                } catch (Exception e) {
-                                                    
-                                                } 
-						log.info("Sending Put In Sack command to agent:****** "+objectName+"**********");							
-						
-						
-						//							}
+						try {
+							System.out.println("PICKUP " + objectName);
+							System.out.println("closestJewel.getName(): " + closestJewel.getName());
+							c.putInSack(objectName);
+
+							Thread.sleep(2000);
+							System.out.println("DESTROY - closestJewel.getName(): " + closestJewel.getName());
+							destroyThingByName(knownJewels, objectName);
+
+							if (closestJewel != null && closestJewel.getName().equals(objectName)) {
+								closestJewel = null;
+							}
+						} catch (Exception e) {
+						}
 					}
 					if(action.equals("EATIT")){
-                                                try {
-                                                 c.eatIt(objectName);
-                                                } catch (Exception e) {
-                                                    
-                                                }
-						log.info("Sending Eat command to agent:****** "+objectName+"**********");							
+						try {
+							c.eatIt(objectName);
+							System.out.println("EATIT " + objectName);
+							System.out.println("closestApple.getName(): " + closestApple.getName());
+
+							Thread.sleep(2000);
+							System.out.println("DESTROY - closestApple.getName(): " + closestApple.getName());
+							destroyThingByName(knownApples, objectName);
+							if (closestApple != null && closestApple.getName().equals(objectName)) {
+								closestApple = null;
+							}
+						} catch (Exception e) {
+						}						
 					}
 					if(action.equals("BURY")){
-                                                try {
-                                                 c.hideIt(objectName);
-                                                } catch (Exception e) {
-                                                    
-                                                }
+						try {
+							c.hideIt(objectName);
+						} catch (Exception e) {
+							
+						}
 						log.info("Sending Bury command to agent:****** "+objectName+"**********");							
 					}
 				}
-//                                else if (jsonAction.has("ACTION")) {
-//                                    int x=0,y=0;
-//                                    String action=jsonAction.getString("ACTION");
-//                                    if(action.equals("FORAGE")){
-//                                                try {
-//                                                      x = r.nextInt(600);
-//                                                      y = r.nextInt(800);
-//                                                 c.moveto(1, x,y );
-//                                                } catch (Exception e) {
-//                                                    
-//                                                }
-//						System.out.println("Sending Forage command to agent:****** ("+x+","+y+") **********");							
-//					}
-//                                }
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 
 		}
-//		System.out.println("OK_hands");
 		previousHandsAction = (String) handsMO.getI();
+
+		knownJewelsMO.setI(knownJewels);
+		knownApplesMO.setI(knownApples);
+		closestJewelMO.setI(closestJewel);
+		closestAppleMO.setI(closestApple);
 	}//end proc
 
     @Override
@@ -122,5 +146,11 @@ public class HandsActionCodelet extends Codelet{
         
     }
 
+	private List<Thing> destroyThingByName(List<Thing> things, String thingName) {
+		synchronized(things) {
+			things.removeIf(t -> t.getName().equals(thingName));
+		}
+		return things;
+	}
 
 }
