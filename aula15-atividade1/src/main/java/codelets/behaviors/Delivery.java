@@ -31,7 +31,6 @@ import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryContainer;
 import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.representation.idea.Idea;
-import ws3dproxy.model.Thing;
 
 
 public class Delivery extends Codelet {
@@ -49,8 +48,6 @@ public class Delivery extends Codelet {
 		this.creatureBasicSpeed=creatureBasicSpeed;
 		this.reachDistance=reachDistance;
         this.name = "Delivery";
-
-
 	}
 
 	@Override
@@ -62,9 +59,6 @@ public class Delivery extends Codelet {
 
 	@Override
 	public void proc() {
-		// Find distance between creature and closest apple
-		//If far, go towards it
-		//If close, stops
 		Idea cis = (Idea) selfInfoMO.getI();
 		List<Boolean> leafletStatus = (List<Boolean>) leafletStatusMO.getI();
 	
@@ -78,48 +72,32 @@ public class Delivery extends Codelet {
 		pSelf.setLocation(selfX, selfY);
 
 		double distance = pSelf.distance(pSpot);
-		// Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
 		try {
 			if(distance>reachDistance && leafletStatus.contains(true)){ //Go to it
-				// message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
-				JSONObject message=new JSONObject();
-				try {
-					message.put("ACTION", "DELIVERY");
-									activation=1.0;
-					legsMO.setI(message.toString(),activation,name);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}else if (leafletStatus.contains(true))
-			{//Stop
-				// message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
-				// message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
-				JSONObject message=new JSONObject();
-				try {
-					message.put("ACTION", "DELIVERY");
-									activation=1.0;
-					legsMO.setI(message.toString(),activation,name);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				System.out.println("leafletStatus.contains(true)" + leafletStatus);
+				Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
+				message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
+				message.add(Idea.createIdea("X",(int)xSpot, Idea.guessType("Property",null,1.0,0.5)));
+				message.add(Idea.createIdea("Y",(int)ySpot, Idea.guessType("Property",null,1.0,0.5)));
+				message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
+				activation=1.0;
+				legsMO.setI(toJson(message),activation,name);
 			}
-            else activation=0.0;
-            JSONObject message=new JSONObject();
-            message.put("ACTION", "DELIVERY");
-            legsMO.setI(message.toString(),activation,name);	
-			
-		} catch (JSONException e) {
+			else if (leafletStatus.contains(true))
+			{
+				JSONObject message=new JSONObject();
+				message.put("ACTION", "DELIVERY");
+				activation=1.0;
+				legsMO.setI(message.toString(),activation,name);
+			}
+            else{
+				legsMO.setI("",activation,name);
+				activation=0.0;
+			}			
+		} 
+		catch (JSONException e) {
 			e.printStackTrace();
-		}	
-                
+		}                
 	}//end proc
         
 	@Override
