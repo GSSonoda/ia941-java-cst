@@ -203,7 +203,6 @@ public class AgentMind extends Mind {
 		eatApple.addInput(closestAppleMO);
 		eatApple.addInput(innerSenseMO);
 		eatApple.addOutput(handsMO);
-                eatApple.addOutput(knownApplesMO);
                 insertCodelet(eatApple);
                 registerCodelet(eatApple,"Behavioral");
                 behavioralCodelets.add(eatApple);
