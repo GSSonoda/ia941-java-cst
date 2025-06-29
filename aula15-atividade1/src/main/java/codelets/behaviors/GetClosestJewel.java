@@ -37,12 +37,10 @@ public class GetClosestJewel extends Codelet {
 
 	private Memory closestJewelMO;
 	private Memory innerSenseMO;
-        private Memory knownMO;
 	private int reachDistance;
 	private Memory handsMO;
-        Thing closestJewel;
-        Idea cis;
-        List<Thing> known;
+    private Thing closestJewel;
+    private Idea cis;
 
 	public GetClosestJewel(int reachDistance) {
         setTimeStep(50);
@@ -55,17 +53,14 @@ public class GetClosestJewel extends Codelet {
 		closestJewelMO=(MemoryObject)this.getInput("CLOSEST_JEWEL");
 		innerSenseMO=(MemoryObject)this.getInput("INNER");
 		handsMO=(MemoryObject)this.getOutput("HANDS");
-        knownMO = (MemoryObject)this.getOutput("KNOWN_JEWELS");
 	}
 
 	@Override
 	public void proc() {
-                String jewelName="";
-                closestJewel = (Thing) closestJewelMO.getI();
-                cis = (Idea) innerSenseMO.getI();
-                known = (List<Thing>) knownMO.getI();
+		String jewelName="";
+		closestJewel = (Thing) closestJewelMO.getI();
+		cis = (Idea) innerSenseMO.getI();
 
-		
 		if(closestJewel != null)
 		{
 			double jewelX=0;
@@ -74,10 +69,7 @@ public class GetClosestJewel extends Codelet {
 				jewelX=closestJewel.getCenterPosition().getX();
 				jewelY=closestJewel.getCenterPosition().getY();
                 jewelName = closestJewel.getName();
-                                
-
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -97,43 +89,23 @@ public class GetClosestJewel extends Codelet {
 					message.put("OBJECT", jewelName);
 					message.put("ACTION", "PICKUP");
 					handsMO.setI(message.toString());
-                                        activation=1.0;
-                                        DestroyClosestJewel();
+                    activation=1.0;
 				}else{
 					handsMO.setI("");	//nothing
                     activation=0.0;
 				}
-				
-//				System.out.println(message);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
 			handsMO.setI("");	//nothing
                         activation=0.0;
 		}
-
 	}
         
-        @Override
-        public void calculateActivation() {
-        
-        }
-        
-        public void DestroyClosestJewel() {
-           int r = -1;
-           int i = 0;
-           synchronized(known) {
-             CopyOnWriteArrayList<Thing> myknown = new CopyOnWriteArrayList<>(known);  
-             for (Thing t : known) {
-              if (closestJewel != null) 
-                 if (t.getName().equals(closestJewel.getName())) r = i;
-              i++;
-             }   
-             if (r != -1) known.remove(r);
-             closestJewel = null;
-           }
-        }
+	@Override
+	public void calculateActivation() {
+	
+	}
 
 }

@@ -212,7 +212,6 @@ public class AgentMind extends Mind {
                 getJewel.addInput(closestJewelMO);
                 getJewel.addInput(innerSenseMO);
                 getJewel.addOutput(handsMO);
-                getJewel.addOutput(knownJewelsMO);
                 insertCodelet(getJewel,"Behavioral");
                 behavioralCodelets.add(getJewel);
                 
