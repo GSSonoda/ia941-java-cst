@@ -94,7 +94,7 @@ public class HandsActionCodelet extends Codelet{
 							System.out.println("closestJewel.getName(): " + closestJewel.getName());
 							c.putInSack(objectName);
 
-							Thread.sleep(2000);
+							Thread.sleep(1000);
 							System.out.println("DESTROY - closestJewel.getName(): " + closestJewel.getName());
 							destroyThingByName(knownJewels, objectName);
 
